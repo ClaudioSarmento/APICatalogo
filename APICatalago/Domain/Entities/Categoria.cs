@@ -1,4 +1,4 @@
-﻿namespace APICatalago.Domain;
+﻿namespace APICatalago.Domain.Entities;
 public class Categoria
 {
     public int Id { get; set; }
