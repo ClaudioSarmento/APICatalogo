@@ -24,12 +24,21 @@ namespace APICatalago.Controllers
             return produtos;
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}",Name="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
             var produto = _context?.Produtos?.FirstOrDefault(p => p.Id == id);
             if (produto is null) return NotFound($"Produto {id} não encontrado...");
             return produto;
+        }
+
+        [HttpPost]
+        public ActionResult Post([FromBody] Produto produto)
+        {
+            if (produto is null) return BadRequest();
+            _context?.Produtos?.Add(produto);
+            _context?.SaveChanges();
+            return new CreatedAtRouteResult("ObterProduto", new {id = produto.Id}, produto);
         }
     }
 }
