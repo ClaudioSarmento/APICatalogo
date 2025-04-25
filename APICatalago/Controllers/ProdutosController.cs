@@ -2,6 +2,7 @@
 using APICatalago.Infrastructure.Data.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Controllers
 {
@@ -39,6 +40,16 @@ namespace APICatalago.Controllers
             _context?.Produtos?.Add(produto);
             _context?.SaveChanges();
             return new CreatedAtRouteResult("ObterProduto", new {id = produto.Id}, produto);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Produto produto) 
+        {
+            if(id != produto.Id || _context == null) return BadRequest();
+            _context.Entry(produto).State = EntityState.Modified;
+            _context?.SaveChanges();
+
+            return Ok(produto);
         }
     }
 }
