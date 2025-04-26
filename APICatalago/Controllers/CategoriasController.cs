@@ -17,6 +17,14 @@ namespace APICatalago.Controllers
             _context = context;
         }
 
+        [HttpGet("produtos")]
+        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        {
+            var categoriaProdutos = _context?.Categorias?.Include(p => p.Produtos).ToList();
+            if (categoriaProdutos is null) return NotFound("CategoriasProdutos não encontrado...");
+            return categoriaProdutos;
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
