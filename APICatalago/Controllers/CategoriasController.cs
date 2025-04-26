@@ -24,6 +24,13 @@ namespace APICatalago.Controllers
             return categorias;
         }
 
-
+        [HttpGet("{id:int}", Name="ObterCategoria")]
+        public ActionResult<Categoria> Get(int id)
+        {
+            var categoria = _context?.Categorias?
+                .FirstOrDefault(c => c.Id == id);
+            if (categoria is null) return NotFound($"Categoria {id} não encontrado");
+            return categoria;
+        }
     }
 }
