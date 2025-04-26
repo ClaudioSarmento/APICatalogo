@@ -30,7 +30,7 @@ namespace APICatalago.Controllers
         {
             var categoria = _context?.Categorias?
                 .FirstOrDefault(c => c.Id == id);
-            if (categoria is null) return NotFound($"Categoria {id} não encontrado");
+            if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             return categoria;
         }
 
@@ -51,6 +51,16 @@ namespace APICatalago.Controllers
             _context?.SaveChanges();
 
             return Ok(categoria);
+        }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult Delete(int id)
+        {
+            var produto = _context?.Produtos?.FirstOrDefault(p => p.Id == id);
+            if (produto is null || _context == null) return NotFound("Categoria não localizada...");
+            _context.Produtos?.Remove(produto);
+            _context?.SaveChanges();
+            return Ok(produto);
         }
     }
 }
