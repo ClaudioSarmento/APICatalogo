@@ -32,5 +32,14 @@ namespace APICatalago.Controllers
             if (categoria is null) return NotFound($"Categoria {id} não encontrado");
             return categoria;
         }
+
+        [HttpPost]
+        public ActionResult Post([FromBody] Categoria categoria)
+        {
+            if (categoria is null) return BadRequest();
+            _context?.Categorias?.Add(categoria);
+            _context?.SaveChanges();
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.Id });
+        }
     }
 }
