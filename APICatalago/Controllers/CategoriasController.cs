@@ -2,6 +2,7 @@
 using APICatalago.Infrastructure.Data.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Controllers
 {
@@ -40,6 +41,16 @@ namespace APICatalago.Controllers
             _context?.Categorias?.Add(categoria);
             _context?.SaveChanges();
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.Id });
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Categoria categoria)
+        {
+            if (id != categoria.Id || _context == null) return BadRequest();
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context?.SaveChanges();
+
+            return Ok(categoria);
         }
     }
 }
