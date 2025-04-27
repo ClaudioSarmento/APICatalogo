@@ -20,7 +20,7 @@ namespace APICatalago.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            var categoriaProdutos = _context?.Categorias?.Include(p => p.Produtos).ToList();
+            var categoriaProdutos = _context?.Categorias?.AsNoTracking().Include(p => p.Produtos).ToList();
             if (categoriaProdutos is null) return NotFound("CategoriasProdutos não encontrado...");
             return categoriaProdutos;
         }
@@ -28,7 +28,7 @@ namespace APICatalago.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context?.Categorias?.ToList();
+            var categorias = _context?.Categorias?.AsNoTracking().ToList();
             if(categorias is null) return NotFound("Categorias não encontradas...");
             return categorias;
         }
@@ -37,7 +37,7 @@ namespace APICatalago.Controllers
         public ActionResult<Categoria> Get(int id)
         {
             var categoria = _context?.Categorias?
-                .FirstOrDefault(c => c.Id == id);
+                .AsNoTracking().FirstOrDefault(c => c.Id == id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             return categoria;
         }
