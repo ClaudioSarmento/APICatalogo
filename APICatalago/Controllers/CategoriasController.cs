@@ -49,7 +49,7 @@ namespace APICatalago.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name="ObterCategoria")]
+        [HttpGet("{id:int:min(1)}", Name="ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
             try
@@ -83,7 +83,7 @@ namespace APICatalago.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int:min(1)}")]
         public ActionResult Put(int id, Categoria categoria)
         {
             try
@@ -100,7 +100,7 @@ namespace APICatalago.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
             try
@@ -117,5 +117,6 @@ namespace APICatalago.Controllers
                     "Ocorreu um problema ao tratar a sua solicitação.");
             }
         }
+
     }
 }
