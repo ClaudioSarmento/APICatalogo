@@ -18,13 +18,14 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasProdutosAsync()
         {
             try
             {
-                var categoriaProdutos = _context?.Categorias?.AsNoTracking().Include(p => p.Produtos).ToList();
-                if (categoriaProdutos is null) return NotFound("CategoriasProdutos não encontrado...");
-                return categoriaProdutos;
+                if (_context?.Categorias == null) return NotFound("CategoriasProdutos não encontradas...");
+                var categoriasProdutos = await _context.Categorias.AsNoTracking().Include(p => p.Produtos).ToListAsync();
+                if (!categoriasProdutos.Any()) return NotFound("CategoriasProdutos não encontrado...");
+                return categoriasProdutos;
             }
             catch (Exception)
             {
@@ -34,12 +35,13 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetAsync()
         {
             try
             {
-                var categorias = _context?.Categorias?.AsNoTracking().ToList();
-                if (categorias is null) return NotFound("Categorias não encontradas...");
+                if (_context?.Categorias == null) return NotFound("Categorias não encontradas...");
+                var categorias = await _context.Categorias.AsNoTracking().ToListAsync();
+                if (!categorias.Any()) return NotFound("Categorias não encontradas...");
                 return categorias;
             }
             catch (Exception)
@@ -50,12 +52,14 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet("{id:int:min(1)}", Name="ObterCategoria")]
-        public ActionResult<Categoria> Get(int id)
+        public async Task<ActionResult<Categoria>> GetAsync(int id)
         {
             try
             {
-                var categoria = _context?.Categorias?
-                    .AsNoTracking().FirstOrDefault(c => c.Id == id);
+                if (_context?.Categorias == null) return NotFound($"Categoria {id} não encontrada");
+                var categoria = await _context.Categorias
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (categoria is null) return NotFound($"Categoria {id} não encontrada");
                 return categoria;
             }
