@@ -13,11 +13,11 @@ public class Categoria
     }
     [Key]
     public int Id { get; set; }
-    [Required]
-    [StringLength(80)]
+    [Required(ErrorMessage = "O nome é obrigatório")]
+    [StringLength(80,ErrorMessage = "O nome deve ter no máximo {1} caracteres")]
     public string? Nome { get; set; }
     [Required]
-    [StringLength(300)]
+    [StringLength(300, ErrorMessage = "A imagemUrl deve ter no máximo {1} caracteres")]
     public string? ImagemUrl { get; set; }
     public ICollection<Produto>? Produtos { get; set; }
 }

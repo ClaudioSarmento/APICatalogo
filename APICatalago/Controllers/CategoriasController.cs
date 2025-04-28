@@ -88,7 +88,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpPut("{id:int:min(1)}")]
-        public ActionResult Put(int id, Categoria categoria)
+        public ActionResult Put(int id, [FromBody] Categoria categoria)
         {
             try
             {
