@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using APICatalago.Validations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -11,6 +12,7 @@ public class Produto
     public int Id { get; set; }
     [Required(ErrorMessage = "O nome é obrigatório")]
     [StringLength(80)]
+    [PrimeiraLetraMaiuscula]
     public string? Nome { get; set; }
     [Required(ErrorMessage = "A descricao é obrigatória")]
     [StringLength(300)]
