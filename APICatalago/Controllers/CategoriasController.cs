@@ -1,4 +1,5 @@
 ﻿using APICatalago.Domain.Entities;
+using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Categoria>>> GetAsync()
         {
             try

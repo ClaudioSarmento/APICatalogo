@@ -1,4 +1,5 @@
 using APICatalago.Extensions;
+using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -20,6 +21,8 @@ string? mySqlConnection = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseMySql(mySqlConnection,
         ServerVersion.AutoDetect(mySqlConnection)));
+
+builder.Services.AddScoped<ApiLoggingFilter>();
 
 var app = builder.Build();
 
