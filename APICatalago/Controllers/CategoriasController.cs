@@ -1,6 +1,7 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
+using APICatalago.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,45 +12,29 @@ namespace APICatalago.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly AppDbContext? _context;
+        private readonly ICategoriaRepository _repository;
 
-        public CategoriasController(AppDbContext? context)
+        public CategoriasController(ICategoriaRepository repository)
         {
-            _context = context;
-        }
-
-        [HttpGet("produtos")]
-        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasProdutosAsync()
-        {
-            if (_context?.Categorias == null) return NotFound("CategoriasProdutos não encontradas...");
-            var categoriasProdutos = await _context.Categorias.AsNoTracking().Include(p => p.Produtos).ToListAsync();
-            if (!categoriasProdutos.Any()) return NotFound("CategoriasProdutos não encontrado...");
-            return categoriasProdutos;
+          _repository = repository;
         }
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<Categoria>>> GetAsync()
+        public ActionResult<IEnumerable<Categoria>> Get()
         {
 
-            if (_context?.Categorias == null) return NotFound("Categorias não encontradas...");
-            var categorias = await _context.Categorias.AsNoTracking().ToListAsync();
-            if (!categorias.Any()) return NotFound("Categorias não encontradas...");
-            return categorias;
+            var categorias = _repository.GetCategorias();
+            return Ok(categorias);
 
         }
 
         [HttpGet("{id:int:min(1)}", Name = "ObterCategoria")]
-        public async Task<ActionResult<Categoria>> GetAsync(int id)
+        public ActionResult<Categoria> Get(int id)
         {
-
-            if (_context?.Categorias == null) return NotFound($"Categoria {id} não encontrada");
-            var categoria = await _context.Categorias
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var categoria = _repository.GetCategoria(id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             return categoria;
-
 
         }
 
@@ -57,10 +42,9 @@ namespace APICatalago.Controllers
         public ActionResult Post([FromBody] Categoria categoria)
         {
 
-            if (categoria is null) return BadRequest();
-            _context?.Categorias?.Add(categoria);
-            _context?.SaveChanges();
-            return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.Id });
+            if (categoria is null) return BadRequest("Dados inválidos");
+            var categoriaPost =  _repository.Create(categoria);
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaPost.Id });
 
         }
 
@@ -68,10 +52,9 @@ namespace APICatalago.Controllers
         public ActionResult Put(int id, [FromBody] Categoria categoria)
         {
 
-            if (id != categoria.Id || _context == null) return BadRequest();
-            _context.Entry(categoria).State = EntityState.Modified;
-            _context?.SaveChanges();
-            return Ok(categoria);
+            if (id != categoria.Id) return BadRequest("Dados inválidos");
+            var categoriaUpdate = _repository.Update(categoria);
+            return Ok(categoriaUpdate);
 
         }
 
@@ -79,11 +62,8 @@ namespace APICatalago.Controllers
         public ActionResult Delete(int id)
         {
 
-            var produto = _context?.Produtos?.FirstOrDefault(p => p.Id == id);
-            if (produto is null || _context == null) return NotFound("Categoria não localizada...");
-            _context.Produtos?.Remove(produto);
-            _context?.SaveChanges();
-            return Ok(produto);
+            var categoria = _repository.Delete(id);
+            return Ok(categoria);
 
         }
 
