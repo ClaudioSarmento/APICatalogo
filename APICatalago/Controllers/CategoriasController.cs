@@ -21,107 +21,70 @@ namespace APICatalago.Controllers
         [HttpGet("produtos")]
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasProdutosAsync()
         {
-            try
-            {
-                if (_context?.Categorias == null) return NotFound("CategoriasProdutos não encontradas...");
-                var categoriasProdutos = await _context.Categorias.AsNoTracking().Include(p => p.Produtos).ToListAsync();
-                if (!categoriasProdutos.Any()) return NotFound("CategoriasProdutos não encontrado...");
-                return categoriasProdutos;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+            if (_context?.Categorias == null) return NotFound("CategoriasProdutos não encontradas...");
+            var categoriasProdutos = await _context.Categorias.AsNoTracking().Include(p => p.Produtos).ToListAsync();
+            if (!categoriasProdutos.Any()) return NotFound("CategoriasProdutos não encontrado...");
+            return categoriasProdutos;
         }
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Categoria>>> GetAsync()
         {
-            try
-            {
-                if (_context?.Categorias == null) return NotFound("Categorias não encontradas...");
-                var categorias = await _context.Categorias.AsNoTracking().ToListAsync();
-                if (!categorias.Any()) return NotFound("Categorias não encontradas...");
-                return categorias;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+
+            if (_context?.Categorias == null) return NotFound("Categorias não encontradas...");
+            var categorias = await _context.Categorias.AsNoTracking().ToListAsync();
+            if (!categorias.Any()) return NotFound("Categorias não encontradas...");
+            return categorias;
+
         }
 
-        [HttpGet("{id:int:min(1)}", Name="ObterCategoria")]
+        [HttpGet("{id:int:min(1)}", Name = "ObterCategoria")]
         public async Task<ActionResult<Categoria>> GetAsync(int id)
         {
-            try
-            {
-                if (_context?.Categorias == null) return NotFound($"Categoria {id} não encontrada");
-                var categoria = await _context.Categorias
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Id == id);
-                if (categoria is null) return NotFound($"Categoria {id} não encontrada");
-                return categoria;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+
+            if (_context?.Categorias == null) return NotFound($"Categoria {id} não encontrada");
+            var categoria = await _context.Categorias
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (categoria is null) return NotFound($"Categoria {id} não encontrada");
+            return categoria;
+
+
         }
 
         [HttpPost]
         public ActionResult Post([FromBody] Categoria categoria)
         {
-            try
-            {
-                if (categoria is null) return BadRequest();
-                _context?.Categorias?.Add(categoria);
-                _context?.SaveChanges();
-                return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.Id });
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+
+            if (categoria is null) return BadRequest();
+            _context?.Categorias?.Add(categoria);
+            _context?.SaveChanges();
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.Id });
+
         }
 
         [HttpPut("{id:int:min(1)}")]
         public ActionResult Put(int id, [FromBody] Categoria categoria)
         {
-            try
-            {
-                if (id != categoria.Id || _context == null) return BadRequest();
-                _context.Entry(categoria).State = EntityState.Modified;
-                _context?.SaveChanges();
-                return Ok(categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+
+            if (id != categoria.Id || _context == null) return BadRequest();
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context?.SaveChanges();
+            return Ok(categoria);
+
         }
 
         [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
-            try
-            {
-                var produto = _context?.Produtos?.FirstOrDefault(p => p.Id == id);
-                if (produto is null || _context == null) return NotFound("Categoria não localizada...");
-                _context.Produtos?.Remove(produto);
-                _context?.SaveChanges();
-                return Ok(produto);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar a sua solicitação.");
-            }
+
+            var produto = _context?.Produtos?.FirstOrDefault(p => p.Id == id);
+            if (produto is null || _context == null) return NotFound("Categoria não localizada...");
+            _context.Produtos?.Remove(produto);
+            _context?.SaveChanges();
+            return Ok(produto);
+
         }
 
     }
