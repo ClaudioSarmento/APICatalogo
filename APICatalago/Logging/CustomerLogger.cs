@@ -14,7 +14,7 @@ public class CustomerLogger : ILogger
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public bool IsEnabled(LogLevel logLevel)
@@ -30,7 +30,9 @@ public class CustomerLogger : ILogger
 
     private void EscreverTextoNoArquivo(string message)
     {
-        string caminhoArquivoLog = @"c:\dados\log\ApiCatalago.txt";
+        string caminhoArquivoLog = @"c:\dados\log\";
+        Directory.CreateDirectory(caminhoArquivoLog);
+        caminhoArquivoLog += "ApiCatalago.txt";
         using(StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true)) 
         {
             try
