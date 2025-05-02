@@ -4,6 +4,7 @@ using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Logging;
 using APICatalago.Repositories;
 using APICatalago.Repositories.Interfaces;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -32,6 +33,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRespository>();
+// Scoped repository generico
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {
