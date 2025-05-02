@@ -10,8 +10,8 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
-        public ProdutosController(IProdutoRepository respository)
+        private readonly IRepository<Produto> _repository;
+        public ProdutosController(IRepository<Produto> respository)
         {
             _repository = respository;
         }
@@ -21,7 +21,7 @@ namespace APICatalago.Controllers
         {
 
            
-            var produtos = _repository.GetProdutos();
+            var produtos = _repository.GetAll();
             if (!produtos.Any()) return NotFound("Produtos não encontrados...");
             return Ok(produtos);
 
@@ -32,7 +32,7 @@ namespace APICatalago.Controllers
         {
 
            
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.Get(p => p.Id == id);
             if (produto is null) return NotFound($"Produto {id} não encontrado...");
             return Ok(produto);
 
@@ -43,7 +43,7 @@ namespace APICatalago.Controllers
         {
 
             if (produto is null) return BadRequest();
-            var produtoCriado = _repository.Create(produto);
+            var produtoCriado = _repository.Add(produto);
             return new CreatedAtRouteResult("ObterProduto", new { id = produtoCriado.Id }, produtoCriado);
 
         }
@@ -61,9 +61,11 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.Delete(id);
-            return Ok(produto);
+            var produto = _repository.Get(p => p.Id == id);
+            var produtoDeletado = _repository.Delete(produto);
+            return Ok(produtoDeletado);
 
         }
+
     }
 }
