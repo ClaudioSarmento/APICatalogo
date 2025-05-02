@@ -3,6 +3,7 @@ using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Logging;
 using APICatalago.Repositories;
+using APICatalago.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 

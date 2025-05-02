@@ -1,5 +1,6 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.Infrastructure.Data.Context;
+using APICatalago.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Repositories

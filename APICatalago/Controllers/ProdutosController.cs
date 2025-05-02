@@ -1,6 +1,6 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.Infrastructure.Data.Context;
-using APICatalago.Repositories;
+using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

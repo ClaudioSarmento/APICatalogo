@@ -1,7 +1,7 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
-using APICatalago.Repositories;
+using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
