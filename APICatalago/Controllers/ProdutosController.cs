@@ -10,10 +10,18 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IRepository<Produto> _repository;
-        public ProdutosController(IRepository<Produto> respository)
+        private readonly IProdutoRepository _repository;
+        public ProdutosController(IProdutoRepository respository)
         {
             _repository = respository;
+        }
+
+        [HttpGet("produtos/{categoriaId}")]
+        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int categoriaId)
+        {
+            var produtos = _repository.GetProdutosPorCategoria(categoriaId);
+            if (produtos is null) return NotFound();
+            return Ok(produtos);
         }
 
         [HttpGet]
