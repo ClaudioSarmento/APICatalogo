@@ -12,11 +12,11 @@ namespace APICatalago.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly IRepository<Categoria> _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoriasController(IRepository<Categoria> repository)
+        public CategoriasController(IUnitOfWork unitOfWork)
         {
-          _repository = repository;
+          _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace APICatalago.Controllers
         public ActionResult<IEnumerable<Categoria>> Get()
         {
 
-            var categorias = _repository.GetAll();
+            var categorias = _unitOfWork.CategoriaRepository.GetAll(); 
             return Ok(categorias);
 
         }
@@ -32,7 +32,7 @@ namespace APICatalago.Controllers
         [HttpGet("{id:int:min(1)}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _repository.Get(c => c.Id == id);
+            var categoria = _unitOfWork.CategoriaRepository.Get(c => c.Id == id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             return categoria;
 
@@ -43,7 +43,8 @@ namespace APICatalago.Controllers
         {
 
             if (categoria is null) return BadRequest("Dados inválidos");
-            var categoriaPost =  _repository.Add(categoria);
+            var categoriaPost = _unitOfWork.CategoriaRepository.Add(categoria);
+            _unitOfWork.Commit();
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaPost.Id });
 
         }
@@ -53,7 +54,8 @@ namespace APICatalago.Controllers
         {
 
             if (id != categoria.Id) return BadRequest("Dados inválidos");
-            var categoriaUpdate = _repository.Update(categoria);
+            var categoriaUpdate = _unitOfWork.CategoriaRepository.Update(categoria);
+            _unitOfWork.Commit();
             return Ok(categoriaUpdate);
 
         }
@@ -61,9 +63,10 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
-            var categoria = _repository.Get(c =>c.Id == id);
+            var categoria = _unitOfWork.CategoriaRepository.Get(c =>c.Id == id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
-            var categoriaDeletada = _repository.Delete(categoria);
+            var categoriaDeletada = _unitOfWork.CategoriaRepository.Delete(categoria);
+            _unitOfWork.Commit();
             return Ok(categoria);
 
         }

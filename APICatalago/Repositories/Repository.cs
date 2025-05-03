@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
 
 namespace APICatalago.Repositories
@@ -16,7 +17,7 @@ namespace APICatalago.Repositories
 
         public IEnumerable<T> GetAll()
         {
-            var dados = _context.Set<T>().ToList();
+            var dados = _context.Set<T>().AsNoTracking().ToList();
             return dados;
         }
         public T? Get(Expression<Func<T, bool>> predicate)
@@ -28,19 +29,16 @@ namespace APICatalago.Repositories
         public T Add(T entity)
         {
             _context.Set<T>().Add(entity);
-            _context.SaveChanges();
             return entity;
         }
         public T Update(T entity)
         {
             _context.Set<T>().Update(entity);
-            _context.SaveChanges();
             return entity;
         }
         public T Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
-            _context.SaveChanges();
             return entity;
         }
 

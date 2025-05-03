@@ -33,6 +33,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRespository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Scoped repository generico
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

@@ -10,16 +10,16 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
-        public ProdutosController(IProdutoRepository respository)
+        private IUnitOfWork _unitOfWork;
+        public ProdutosController(IUnitOfWork unitOfWork)
         {
-            _repository = respository;
+            _unitOfWork = unitOfWork;   
         }
 
         [HttpGet("produtos/{categoriaId}")]
         public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int categoriaId)
         {
-            var produtos = _repository.GetProdutosPorCategoria(categoriaId);
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutosPorCategoria(categoriaId);
             if (produtos is null) return NotFound();
             return Ok(produtos);
         }
@@ -29,7 +29,7 @@ namespace APICatalago.Controllers
         {
 
            
-            var produtos = _repository.GetAll();
+            var produtos = _unitOfWork.ProdutoRepository.GetAll();
             if (!produtos.Any()) return NotFound("Produtos não encontrados...");
             return Ok(produtos);
 
@@ -40,7 +40,7 @@ namespace APICatalago.Controllers
         {
 
            
-            var produto = _repository.Get(p => p.Id == id);
+            var produto = _unitOfWork.ProdutoRepository.Get(p => p.Id == id);
             if (produto is null) return NotFound($"Produto {id} não encontrado...");
             return Ok(produto);
 
@@ -51,7 +51,8 @@ namespace APICatalago.Controllers
         {
 
             if (produto is null) return BadRequest();
-            var produtoCriado = _repository.Add(produto);
+            var produtoCriado = _unitOfWork.ProdutoRepository.Add(produto);
+            _unitOfWork.Commit();
             return new CreatedAtRouteResult("ObterProduto", new { id = produtoCriado.Id }, produtoCriado);
 
         }
@@ -61,7 +62,8 @@ namespace APICatalago.Controllers
         {
 
             if (id != produto.Id) return BadRequest();
-            var produtoAlterado = _repository.Update(produto);
+            var produtoAlterado = _unitOfWork.ProdutoRepository.Update(produto);
+            _unitOfWork.Commit();
             return Ok(produtoAlterado);
 
         }
@@ -69,8 +71,10 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.Get(p => p.Id == id);
-            var produtoDeletado = _repository.Delete(produto);
+            var produto = _unitOfWork.ProdutoRepository.Get(p => p.Id == id);
+            if (produto is null) return NotFound($"Produto {id} não encontrada");
+            var produtoDeletado = _unitOfWork.ProdutoRepository.Delete(produto);
+            _unitOfWork.Commit();
             return Ok(produtoDeletado);
 
         }
