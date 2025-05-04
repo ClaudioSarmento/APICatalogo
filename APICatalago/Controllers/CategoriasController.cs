@@ -1,5 +1,6 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.DTOs;
+using APICatalago.DTOs.Mappings;
 using APICatalago.Filters;
 using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,15 +24,7 @@ namespace APICatalago.Controllers
         {
 
             var categorias = _unitOfWork.CategoriaRepository.GetAll();
-            var categoriasDto = categorias
-                .Select(
-                    c => new CategoriaDTO
-                    {
-                        Id = c.Id,
-                        Nome = c.Nome,
-                        ImagemUrl = c.ImagemUrl,
-                    }
-                );
+            var categoriasDto = categorias.ToCategoriaDTOList();
             return Ok(categoriasDto);
 
         }
@@ -41,15 +34,8 @@ namespace APICatalago.Controllers
         {
             var categoria = _unitOfWork.CategoriaRepository.Get(c => c.Id == id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
-
-            var categoriaDto = new CategoriaDTO()
-            {
-                Id = categoria.Id,
-                Nome = categoria.Nome,
-                ImagemUrl = categoria.ImagemUrl
-                
-            };
-            return categoriaDto;
+            var categoriaDto = categoria.ToCategoriaDTO();
+            return categoriaDto!;
 
         }
 
@@ -58,22 +44,11 @@ namespace APICatalago.Controllers
         {
 
             if (categoriaDto is null) return BadRequest("Dados inválidos");
-            var categoria = new Categoria()
-            {
-                Id = categoriaDto.Id,
-                Nome = categoriaDto.Nome,
-                ImagemUrl = categoriaDto.ImagemUrl
-            };
-            var categoriaPost = _unitOfWork.CategoriaRepository.Add(categoria);
+            var categoria = categoriaDto.ToCategoria();
+            var categoriaPost = _unitOfWork.CategoriaRepository.Add(categoria!);
             _unitOfWork.Commit();
-            var categoriaDtoPost = new CategoriaDTO()
-            {
-                Id = categoriaPost.Id,
-                Nome = categoriaPost.Nome,
-                ImagemUrl = categoriaPost.ImagemUrl
-
-            };
-            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaDtoPost.Id });
+            var categoriaDtoPost = categoriaPost.ToCategoriaDTO();
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaDtoPost!.Id });
 
         }
 
@@ -82,21 +57,10 @@ namespace APICatalago.Controllers
         {
 
             if (id != categoriaDto.Id) return BadRequest("Dados inválidos");
-            var categoria = new Categoria()
-            {
-                Id = categoriaDto.Id,
-                Nome = categoriaDto.Nome,
-                ImagemUrl = categoriaDto.ImagemUrl
-            };
-            var categoriaUpdate = _unitOfWork.CategoriaRepository.Update(categoria);
+            var categoria = categoriaDto.ToCategoria();
+            var categoriaUpdate = _unitOfWork.CategoriaRepository.Update(categoria!);
             _unitOfWork.Commit();
-            var categoriaDtoUpdate = new CategoriaDTO()
-            {
-                Id = categoriaUpdate.Id,
-                Nome = categoriaUpdate.Nome,
-                ImagemUrl = categoriaUpdate.ImagemUrl
-
-            };
+            var categoriaDtoUpdate = categoriaUpdate.ToCategoriaDTO();
             return Ok(categoriaDtoUpdate);
 
         }
@@ -108,13 +72,7 @@ namespace APICatalago.Controllers
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             var categoriaDeletada = _unitOfWork.CategoriaRepository.Delete(categoria);
             _unitOfWork.Commit();
-            var categoriaDto = new CategoriaDTO()
-            {
-                Id = categoria.Id,
-                Nome = categoria.Nome,
-                ImagemUrl = categoria.ImagemUrl
-
-            };
+            var categoriaDto = categoriaDeletada.ToCategoriaDTO();
             return Ok(categoriaDto);
 
         }
