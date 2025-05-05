@@ -1,4 +1,5 @@
 ﻿using APICatalago.Domain.Entities;
+using APICatalago.DTOs;
 using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet("produtos/{categoriaId}")]
-        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int categoriaId)
+        public ActionResult <IEnumerable<ProdutoDTO>> GetProdutosCategoria(int categoriaId)
         {
             var produtos = _unitOfWork.ProdutoRepository.GetProdutosPorCategoria(categoriaId);
             if (produtos is null) return NotFound();
@@ -25,7 +26,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public ActionResult<IEnumerable<ProdutoDTO>> Get()
         {
 
            
@@ -36,7 +37,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        public ActionResult<ProdutoDTO> Get(int id)
         {
 
            
@@ -47,22 +48,22 @@ namespace APICatalago.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] Produto produto)
+        public ActionResult Post([FromBody] ProdutoDTO produtoDto)
         {
 
-            if (produto is null) return BadRequest();
-            var produtoCriado = _unitOfWork.ProdutoRepository.Add(produto);
+            if (produtoDto is null) return BadRequest();
+            var produtoCriado = _unitOfWork.ProdutoRepository.Add(produtoDto);
             _unitOfWork.Commit();
             return new CreatedAtRouteResult("ObterProduto", new { id = produtoCriado.Id }, produtoCriado);
 
         }
 
         [HttpPut("{id:int:min(1)}")]
-        public ActionResult Put(int id, [FromBody] Produto produto)
+        public ActionResult Put(int id, [FromBody] ProdutoDTO produtoDto)
         {
 
-            if (id != produto.Id) return BadRequest();
-            var produtoAlterado = _unitOfWork.ProdutoRepository.Update(produto);
+            if (id != produtoDto.Id) return BadRequest();
+            var produtoAlterado = _unitOfWork.ProdutoRepository.Update(produtoDto);
             _unitOfWork.Commit();
             return Ok(produtoAlterado);
 

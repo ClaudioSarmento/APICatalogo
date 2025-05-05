@@ -2,6 +2,7 @@
 
 namespace APICatalago.DTOs.Mappings
 {
+ 
     public static class CategoriaDTOMappingExtensions
     {
         public static CategoriaDTO? ToCategoriaDTO(this Categoria categoria)

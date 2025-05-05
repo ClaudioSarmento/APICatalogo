@@ -1,3 +1,4 @@
+using APICatalago.DTOs.Mappings;
 using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
@@ -41,6 +42,8 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 {
     LogLevel = LogLevel.Information
 }));
+
+builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
 
 var app = builder.Build();
 
