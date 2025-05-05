@@ -1,9 +1,8 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.DTOs;
-using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Repositories.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Controllers
 {
@@ -12,9 +11,11 @@ namespace APICatalago.Controllers
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;
-        public ProdutosController(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public ProdutosController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;   
+            _mapper = mapper;
         }
 
         [HttpGet("produtos/{categoriaId}")]
@@ -22,7 +23,8 @@ namespace APICatalago.Controllers
         {
             var produtos = _unitOfWork.ProdutoRepository.GetProdutosPorCategoria(categoriaId);
             if (produtos is null) return NotFound();
-            return Ok(produtos);
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
         }
 
         [HttpGet]
@@ -32,7 +34,8 @@ namespace APICatalago.Controllers
            
             var produtos = _unitOfWork.ProdutoRepository.GetAll();
             if (!produtos.Any()) return NotFound("Produtos não encontrados...");
-            return Ok(produtos);
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
 
         }
 
@@ -43,7 +46,8 @@ namespace APICatalago.Controllers
            
             var produto = _unitOfWork.ProdutoRepository.Get(p => p.Id == id);
             if (produto is null) return NotFound($"Produto {id} não encontrado...");
-            return Ok(produto);
+            var produtoDto = _mapper.Map<ProdutoDTO>(produto);
+            return Ok(produtoDto);
 
         }
 
@@ -52,9 +56,11 @@ namespace APICatalago.Controllers
         {
 
             if (produtoDto is null) return BadRequest();
-            var produtoCriado = _unitOfWork.ProdutoRepository.Add(produtoDto);
+            var produto = _mapper.Map<Produto>(produtoDto);
+            var produtoCriado = _unitOfWork.ProdutoRepository.Add(produto);
             _unitOfWork.Commit();
-            return new CreatedAtRouteResult("ObterProduto", new { id = produtoCriado.Id }, produtoCriado);
+            var produtoDtoCriado = _mapper.Map<ProdutoDTO>(produtoCriado);
+            return new CreatedAtRouteResult("ObterProduto", new { id = produtoDtoCriado.Id }, produtoDtoCriado);
 
         }
 
@@ -63,9 +69,11 @@ namespace APICatalago.Controllers
         {
 
             if (id != produtoDto.Id) return BadRequest();
-            var produtoAlterado = _unitOfWork.ProdutoRepository.Update(produtoDto);
+            var produto = _mapper.Map<Produto>(produtoDto);
+            var produtoAlterado = _unitOfWork.ProdutoRepository.Update(produto);
             _unitOfWork.Commit();
-            return Ok(produtoAlterado);
+            var produtoAlteradoDto = _mapper.Map<ProdutoDTO>(produtoAlterado);
+            return Ok(produtoAlteradoDto);
 
         }
 
@@ -76,7 +84,8 @@ namespace APICatalago.Controllers
             if (produto is null) return NotFound($"Produto {id} não encontrada");
             var produtoDeletado = _unitOfWork.ProdutoRepository.Delete(produto);
             _unitOfWork.Commit();
-            return Ok(produtoDeletado);
+            var produtoDeletadoDto = _mapper.Map<ProdutoDTO>(produtoDeletado);
+            return Ok(produtoDeletadoDto);
 
         }
 

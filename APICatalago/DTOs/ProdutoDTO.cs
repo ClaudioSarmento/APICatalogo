@@ -5,7 +5,7 @@ namespace APICatalago.DTOs;
 
 public class ProdutoDTO
 {
-
+    public int Id { get; set; }
     [Required(ErrorMessage = "O nome é obrigatório")]
     [StringLength(80)]
     [PrimeiraLetraMaiuscula]
