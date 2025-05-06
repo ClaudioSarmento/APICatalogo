@@ -1,5 +1,6 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.DTOs;
+using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
@@ -108,6 +109,14 @@ namespace APICatalago.Controllers
             var produtoDeletadoDto = _mapper.Map<ProdutoDTO>(produtoDeletado);
             return Ok(produtoDeletadoDto);
 
+        }
+
+        [HttpGet("pagination")]
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
+        {
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutos(produtosParameters);
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
         }
 
         

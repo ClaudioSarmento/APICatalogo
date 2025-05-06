@@ -17,7 +17,7 @@ namespace APICatalago.Repositories
 
         public IEnumerable<T> GetAll()
         {
-            var dados = _context.Set<T>().AsNoTracking().ToList();
+            var dados = _context.Set<T>().ToList();
             return dados;
         }
         public T? Get(Expression<Func<T, bool>> predicate)
