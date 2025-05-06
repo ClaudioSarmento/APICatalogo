@@ -2,6 +2,7 @@
 using APICatalago.DTOs;
 using APICatalago.Repositories.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APICatalago.Controllers
@@ -77,6 +78,26 @@ namespace APICatalago.Controllers
 
         }
 
+        [HttpPatch("{id}/UpdatePartial")]
+        public ActionResult<ProdutoDTOUpdateResponse> Patch(int id, JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDto)
+        {
+            if (patchProdutoDto is null || id <= 0) return BadRequest();
+            var produto = _unitOfWork.ProdutoRepository.Get(p =>  p.Id == id);
+
+            if (produto is null) return NotFound();
+
+            var produtoUpdateRequest = _mapper.Map<ProdutoDTOUpdateRequest>(produto);
+
+            patchProdutoDto.ApplyTo(produtoUpdateRequest, ModelState);
+            if(!ModelState.IsValid || !TryValidateModel(produtoUpdateRequest)) 
+                return BadRequest(ModelState);
+            _mapper.Map(produtoUpdateRequest, produto);
+            _unitOfWork.ProdutoRepository.Update(produto);
+            _unitOfWork.Commit();
+            return Ok(_mapper.Map<ProdutoDTOUpdateResponse>(produto));
+        }
+
+
         [HttpDelete("{id:int:min(1)}")]
         public ActionResult Delete(int id)
         {
@@ -89,5 +110,6 @@ namespace APICatalago.Controllers
 
         }
 
+        
     }
 }
