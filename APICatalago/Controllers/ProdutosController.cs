@@ -22,6 +22,22 @@ namespace APICatalago.Controllers
             _mapper = mapper;
         }
 
+        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutos(PagedList<Produto> produtos)
+        {
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious
+            };
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
+        }
+
         [HttpGet("produtos/{categoriaId}")]
         public ActionResult <IEnumerable<ProdutoDTO>> GetProdutosCategoria(int categoriaId)
         {
@@ -55,23 +71,18 @@ namespace APICatalago.Controllers
 
         }
 
-
         [HttpGet("pagination")]
         public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
         {
             var produtos = _unitOfWork.ProdutoRepository.GetProdutos(produtosParameters);
-            var metadata = new
-            {
-                produtos.TotalCount,
-                produtos.PageSize,
-                produtos.CurrentPage,
-                produtos.TotalPages,
-                produtos.HasNext,
-                produtos.HasPrevious
-            };
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
-            return Ok(produtosDto);
+            return ObterProdutos(produtos);
+        }
+
+        [HttpGet("filter/preco/pagination")]
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosFiltroPreco produtosFiltroPreco)
+        {
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutosFiltroPreco(produtosFiltroPreco);
+            return ObterProdutos(produtos);
         }
 
         [HttpPost]
@@ -84,7 +95,7 @@ namespace APICatalago.Controllers
             _unitOfWork.Commit();
             var produtoDtoCriado = _mapper.Map<ProdutoDTO>(produtoCriado);
             return new CreatedAtRouteResult("ObterProduto", new { id = produtoDtoCriado.Id }, produtoDtoCriado);
-
+           
         }
 
         [HttpPut("{id:int:min(1)}")]

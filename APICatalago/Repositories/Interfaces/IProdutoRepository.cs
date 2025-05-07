@@ -7,5 +7,7 @@ namespace APICatalago.Repositories.Interfaces
     {
         PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters);
         IEnumerable<Produto> GetProdutosPorCategoria(int idCategoria);
+
+        PagedList<Produto> GetProdutosFiltroPreco(ProdutosFiltroPreco produtosFiltroPreco);
     }
 }
