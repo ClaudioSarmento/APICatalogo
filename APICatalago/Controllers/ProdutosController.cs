@@ -1,10 +1,12 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.DTOs;
+using APICatalago.Infrastructure.Mocks;
 using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace APICatalago.Controllers
 {
@@ -51,6 +53,25 @@ namespace APICatalago.Controllers
             var produtoDto = _mapper.Map<ProdutoDTO>(produto);
             return Ok(produtoDto);
 
+        }
+
+
+        [HttpGet("pagination")]
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
+        {
+            var produtos = _unitOfWork.ProdutoRepository.GetProdutos(produtosParameters);
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious
+            };
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+            return Ok(produtosDto);
         }
 
         [HttpPost]
@@ -110,15 +131,6 @@ namespace APICatalago.Controllers
             return Ok(produtoDeletadoDto);
 
         }
-
-        [HttpGet("pagination")]
-        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParameters)
-        {
-            var produtos = _unitOfWork.ProdutoRepository.GetProdutos(produtosParameters);
-            var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
-            return Ok(produtosDto);
-        }
-
         
     }
 }
