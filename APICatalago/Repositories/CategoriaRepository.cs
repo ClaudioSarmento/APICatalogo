@@ -9,24 +9,25 @@ public class CategoriaRepository : Repository<Categoria>, ICategoriaRepository
 {
     public CategoriaRepository(AppDbContext context) : base(context) { }
 
-    public PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParameters)
+    public async Task<PagedList<Categoria>> GetCategoriasAsync(CategoriasParameters categoriasParameters)
     {
-        var categorias = GetAll()
-               .OrderBy(c => c.Id)
-               .AsQueryable();
-        var categoriasOrdenadas = PagedList<Categoria>.ToPagedList(categorias, categoriasParameters.PageNumber, categoriasParameters.PageSize);
-        return categoriasOrdenadas;
+        var categorias = await GetAllAsync();
+        var categoriasOrdenadas = categorias
+        .OrderBy(c => c.Id)
+        .AsQueryable();
+        return PagedList<Categoria>.ToPagedList(categoriasOrdenadas, categoriasParameters.PageNumber, categoriasParameters.PageSize);
     }
 
-    public PagedList<Categoria> GetCategoriasFiltroNome(CategoriasFiltroNome categoriasFiltroNome)
+    public async Task<PagedList<Categoria>> GetCategoriasFiltroNomeAsync(CategoriasFiltroNome categoriasFiltroNome)
     {
-        var categorias = GetAll().AsQueryable();
+        var categorias = await GetAllAsync();
+        var categoriasAsQueryable = categorias.AsQueryable();
         if (!string.IsNullOrWhiteSpace(categoriasFiltroNome.Nome))
         {
             categorias = categorias.Where(c => c.Nome!.ToLowerInvariant().Contains(categoriasFiltroNome.Nome.ToLowerInvariant()));
         }
         categorias = categorias.OrderBy(p => p.Nome);
-        var categoriasFiltradas = PagedList<Categoria>.ToPagedList(categorias, categoriasFiltroNome.PageNumber, categoriasFiltroNome.PageSize);
+        var categoriasFiltradas = PagedList<Categoria>.ToPagedList(categoriasAsQueryable, categoriasFiltroNome.PageNumber, categoriasFiltroNome.PageSize);
         return categoriasFiltradas;
     }
 }

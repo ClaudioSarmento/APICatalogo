@@ -10,18 +10,20 @@ public class ProdutoRespository : Repository<Produto>, IProdutoRepository
   
     public ProdutoRespository(AppDbContext context) : base(context) { }
 
-    public PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters)
+    public async Task<PagedList<Produto>> GetProdutosAsync(ProdutosParameters produtosParameters)
     {
-        var produtos = GetAll()
+        var produtos = await GetAllAsync();
+
+        var produtosOrdenados = produtos
             .OrderBy(p => p.Id)
             .AsQueryable();
-        var produtosOrdenados = PagedList<Produto>.ToPagedList(produtos, produtosParameters.PageNumber, produtosParameters.PageSize);
-        return produtosOrdenados;
+
+        return PagedList<Produto>.ToPagedList(produtosOrdenados, produtosParameters.PageNumber, produtosParameters.PageSize);
     }
 
-    public PagedList<Produto> GetProdutosFiltroPreco(ProdutosFiltroPreco produtosFiltroPreco)
+    public async Task<PagedList<Produto>> GetProdutosFiltroPrecoAsync(ProdutosFiltroPreco produtosFiltroPreco)
     {
-        var produtos = GetAll().AsQueryable();
+        var produtos = await GetAllAsync();
         if (produtosFiltroPreco.Preco.HasValue &&
             !string.IsNullOrWhiteSpace(produtosFiltroPreco.PrecoCriterio))
         {
@@ -34,14 +36,19 @@ public class ProdutoRespository : Repository<Produto>, IProdutoRepository
                 _ => produtos
             };
         }
-        produtos = produtos.OrderBy(p => p.Preco);
-        var produtosFiltrados = PagedList<Produto>.ToPagedList(produtos, produtosFiltroPreco.PageNumber, produtosFiltroPreco.PageSize);
+        var produtosAsQueryable = produtos
+            .AsQueryable()
+            .OrderBy(p => p.Preco);
+        var produtosFiltrados = PagedList<Produto>.ToPagedList(produtosAsQueryable, produtosFiltroPreco.PageNumber, produtosFiltroPreco.PageSize);
         return produtosFiltrados;
 
     }
 
-    public IEnumerable<Produto> GetProdutosPorCategoria(int idCategoria)
+    public async Task<IEnumerable<Produto>> GetProdutosPorCategoriaAsync(int idCategoria)
     {
-        return GetAll().Where(c => c.CategoriaId == idCategoria);
+        var produtos = await GetAllAsync();
+        var produtosPorCategoria = produtos
+            .Where(c => c.CategoriaId == idCategoria);
+        return produtosPorCategoria;
     }
 }

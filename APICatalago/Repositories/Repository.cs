@@ -15,14 +15,14 @@ namespace APICatalago.Repositories
             _context = context;
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            var dados = _context.Set<T>().ToList();
+            var dados = await _context.Set<T>().AsNoTracking().ToListAsync();
             return dados;
         }
-        public T? Get(Expression<Func<T, bool>> predicate)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
         {
-            var dados = _context.Set<T>().FirstOrDefault(predicate);
+            var dados = await _context.Set<T>().FirstOrDefaultAsync(predicate);
             return dados;
         }
 
