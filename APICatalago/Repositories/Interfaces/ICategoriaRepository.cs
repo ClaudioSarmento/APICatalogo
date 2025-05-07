@@ -5,4 +5,6 @@ namespace APICatalago.Repositories.Interfaces;
 public interface ICategoriaRepository : IRepository<Categoria>
 {
     PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParameters);
+
+    PagedList<Categoria> GetCategoriasFiltroNome(CategoriasFiltroNome CategoriasFiltroNome);
 }

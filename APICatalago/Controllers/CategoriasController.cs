@@ -31,11 +31,8 @@ namespace APICatalago.Controllers
 
         }
 
-        [HttpGet("pagination")]
-        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriasParameters)
+        private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(PagedList<Categoria> categorias)
         {
-
-            var categorias = _unitOfWork.CategoriaRepository.GetCategorias(categoriasParameters);
             var metadata = new
             {
                 categorias.TotalCount,
@@ -48,6 +45,23 @@ namespace APICatalago.Controllers
             Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
             var categoriasDto = categorias.ToCategoriaDTOList();
             return Ok(categoriasDto);
+        }
+
+        [HttpGet("pagination")]
+        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriasParameters)
+        {
+
+            var categorias = _unitOfWork.CategoriaRepository.GetCategorias(categoriasParameters);
+            return ObterCategorias(categorias);
+
+        }
+
+        [HttpGet("filter/nome/pagination")]
+        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasFiltroNome categoriasFiltroNome)
+        {
+
+            var categorias = _unitOfWork.CategoriaRepository.GetCategoriasFiltroNome(categoriasFiltroNome);
+            return ObterCategorias(categorias);
 
         }
 
