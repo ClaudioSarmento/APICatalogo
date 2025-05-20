@@ -4,6 +4,7 @@ using APICatalago.DTOs.Mappings;
 using APICatalago.Filters;
 using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -19,7 +20,7 @@ namespace APICatalago.Controllers
         {
           _unitOfWork = unitOfWork;
         }
-
+        
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetAsync()

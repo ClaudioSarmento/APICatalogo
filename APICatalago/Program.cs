@@ -5,6 +5,7 @@ using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Logging;
 using APICatalago.Repositories;
 using APICatalago.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -26,6 +27,14 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+       .AddEntityFrameworkStores<AppDbContext>()
+       .AddDefaultTokenProviders();
+    
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication("Bearer").AddJwtBearer();
 
 string? mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -58,9 +67,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
