@@ -12,6 +12,7 @@ namespace APICatalago.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;

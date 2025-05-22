@@ -4,6 +4,7 @@ using APICatalago.Infrastructure.Mocks;
 using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ namespace APICatalago.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;
