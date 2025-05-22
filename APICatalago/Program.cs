@@ -6,6 +6,7 @@ using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Logging;
 using APICatalago.Repositories;
 using APICatalago.Repositories.Interfaces;
+using APICatalago.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -73,6 +74,7 @@ builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRespository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 // Scoped repository generico
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
