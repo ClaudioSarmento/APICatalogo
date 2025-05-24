@@ -50,6 +50,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetAsync()
         {
 
