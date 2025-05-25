@@ -4,6 +4,7 @@ using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Infrastructure.Data.Context;
 using APICatalago.Logging;
+using APICatalago.RateLimitOptions;
 using APICatalago.Repositories;
 using APICatalago.Repositories.Interfaces;
 using APICatalago.Services;
@@ -111,13 +112,17 @@ builder.Services.AddAuthorization(options =>
     context.User.IsInRole("SuperAdmin"))));
 });
 
+var myOptions = new MyRateLimitOptions();
+
+builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(myOptions);
+
 builder.Services.AddRateLimiter(rateLimiterOptions =>
 {
     rateLimiterOptions.AddFixedWindowLimiter(policyName: "fixedwindow", options =>
     {
-        options.PermitLimit = 1;
-        options.Window = TimeSpan.FromSeconds(5);
-        options.QueueLimit = 2;
+        options.PermitLimit = myOptions.PermitLimit; //1;
+        options.Window = TimeSpan.FromSeconds(myOptions.Window); //TimeSpan.FromSeconds(5);
+        options.QueueLimit = myOptions.QueueLimit; //2;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
     rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
