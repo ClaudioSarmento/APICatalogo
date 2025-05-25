@@ -6,6 +6,7 @@ using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json;
 
 namespace APICatalago.Controllers
@@ -13,6 +14,7 @@ namespace APICatalago.Controllers
     [Route("[controller]")]
     [ApiController]
     [Authorize]
+    [EnableRateLimiting("fixedwindow")]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -32,7 +34,7 @@ namespace APICatalago.Controllers
             return Ok(categoriasDto);
 
         }
-
+        [DisableRateLimiting]
         private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(PagedList<Categoria> categorias)
         {
             var metadata = new
