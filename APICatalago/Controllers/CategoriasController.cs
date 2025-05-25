@@ -34,7 +34,7 @@ namespace APICatalago.Controllers
             return Ok(categoriasDto);
 
         }
-        [DisableRateLimiting]
+        
         private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(PagedList<Categoria> categorias)
         {
             var metadata = new
