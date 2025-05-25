@@ -13,7 +13,7 @@ namespace APICatalago.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;
