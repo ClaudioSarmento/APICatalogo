@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APICatalago.Controllers
 {
-    [Route("api/teste")]
+    [Route("api/v{version:apiVersion}/teste")]
     [ApiController]
     [ApiVersion("2.0")]
     public class TesteV2Controller : ControllerBase
