@@ -14,7 +14,6 @@ namespace APICatalago.Controllers
     [Route("[controller]")]
     [ApiController]
     [Authorize]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;

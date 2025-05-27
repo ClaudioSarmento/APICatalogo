@@ -15,7 +15,6 @@ namespace APICatalago.Controllers
     [ApiController]
     [Authorize]
     [EnableRateLimiting("fixedwindow")]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;

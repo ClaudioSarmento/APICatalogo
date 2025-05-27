@@ -12,7 +12,6 @@ namespace APICatalago.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _tokenService;
