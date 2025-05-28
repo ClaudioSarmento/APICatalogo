@@ -15,6 +15,7 @@ namespace APICatalago.Controllers
     [ApiController]
     [Authorize]
     //[ApiExplorerSettings(IgnoreApi = true)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;

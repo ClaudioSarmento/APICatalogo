@@ -122,6 +122,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpPut("{id:int:min(1)}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
         public async Task<ActionResult<CategoriaDTO>> Put(int id, [FromBody] CategoriaDTO categoriaDto)
         {
 
