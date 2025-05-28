@@ -15,6 +15,7 @@ namespace APICatalago.Controllers
     [ApiController]
     [Authorize]
     [EnableRateLimiting("fixedwindow")]
+    [Produces("application/json")]
     //[ApiExplorerSettings(IgnoreApi = true)]
     public class CategoriasController : ControllerBase
     {
@@ -106,6 +107,8 @@ namespace APICatalago.Controllers
         /// <returns>O objeto Categoria incluida</returns>
         /// <remarks>Retorna um objeto Categoria incluído</remarks>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<CategoriaDTO>> Post([FromBody] CategoriaDTO categoriaDto)
         {
 
