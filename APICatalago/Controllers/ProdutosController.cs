@@ -14,7 +14,7 @@ namespace APICatalago.Controllers
     [Route("[controller]")]
     [ApiController]
     [Authorize]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    //[ApiExplorerSettings(IgnoreApi = true)]
     public class ProdutosController : ControllerBase
     {
         private IUnitOfWork _unitOfWork;
@@ -50,6 +50,10 @@ namespace APICatalago.Controllers
             return Ok(produtosDto);
         }
 
+        /// <summary>
+        /// Exibe uma relação dos produtos
+        /// </summary>
+        /// <returns>Retorna </returns>
         [HttpGet]
         [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetAsync()
