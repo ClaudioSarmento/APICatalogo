@@ -1,4 +1,5 @@
 ﻿using APICatalago.Controllers;
+using APICatalago.DTOs;
 using ApiCatalagoxUnitTests.UnitTests;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -37,12 +38,53 @@ namespace ApiCatalogoxUnitTests.UnitTests
 
         }
         [Fact]
-        public async Task GetProdutoById_Return_NotFound() { }
+        public async Task GetProdutoById_Return_NotFound() 
+        {
+            //Arrange
+            var prodId = 999;
+
+            //Act
+            var data = await _controller.GetAsync(prodId);
+
+            //Assert (fluentassertions)
+            data.Result.Should().BeOfType<NotFoundObjectResult>()
+                .Which.StatusCode.Should().Be(404);
+
+
+        }
         [Fact]
-        public async Task GetProdutoById_Return_BadRequest() { }
+        public async Task GetProdutoById_Return_BadRequest() 
+        {
+            //Arrange
+            var prodId = -1;
+
+            //Act
+            var data = await _controller.GetAsync(prodId);
+
+            //Assert (fluentassertions)
+            data.Result.Should().BeOfType<BadRequestObjectResult>()
+                .Which.StatusCode.Should().Be(400);
+        }
+
         [Fact]
-        public async Task GetProdutos_Return_ListOfProdutoDTO() { }
+        public async Task GetProdutos_Return_ListOfProdutoDTO() 
+        {
+            // Act
+            var data = await _controller.GetAsync();
+
+            // Assert
+            data.Result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeAssignableTo<IEnumerable<ProdutoDTO>>()
+                .And.NotBeNull();
+        }
         [Fact]
-        public async Task GetProdutos_Return_BadRequestResult() { }
+        public async Task GetProdutos_Return_BadRequestResult() 
+        {
+            // Act
+            var data = await _controller.GetAsync();
+
+            // Assert 
+            data.Result.Should().BeOfType<BadRequestResult>();
+        }
     }
 }
