@@ -162,6 +162,9 @@ namespace APICatalago.Controllers
         [HttpPost]
         [Route("AddUserToRole")]
         [Authorize(Policy = "SuperAdminOnly")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> AddUserToRole(string email, string roleName)
         {
             var user = await _userManager.FindByNameAsync(email);
