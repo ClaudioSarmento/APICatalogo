@@ -1,4 +1,4 @@
-# APICatalago
+# APICatalogo
 
 ## 🔧 Configuração
 
