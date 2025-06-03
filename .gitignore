@@ -365,3 +365,5 @@ FodyWeavers.xsd
 appsettings.json
 /APICatalago/appsettings.json
 /ApiCatalagoxUnitTests/appsettings.Local.json
+
+/ApiCatalogoxUnitTests/appsettings.Local.json
