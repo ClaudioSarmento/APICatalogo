@@ -95,7 +95,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ProdutoDTO produtoDto)
+        public async Task<ActionResult<ProdutoDTO>> Post([FromBody] ProdutoDTO produtoDto)
         {
 
             if (produtoDto is null) return BadRequest();
