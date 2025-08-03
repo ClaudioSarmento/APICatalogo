@@ -100,11 +100,29 @@ namespace APICatalago.Controllers
         /// <param name="id"></param>
         /// <returns>Objetos Categoria</returns>
         [HttpGet("{id:int:min(1)}", Name = "ObterCategoria")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoriaDTO>> GetAsync(int id)
         {
-            var categoria = await _unitOfWork.CategoriaRepository.GetAsync(c => c.Id == id);
-            if (categoria is null) return NotFound($"Categoria {id} não encontrada");
-            var categoriaDto = categoria.ToCategoriaDTO();
+            var CacheCategoriaKey = $"CacheCategoria_{id}";
+            Categoria? categoria;
+
+            if (!_cache.TryGetValue(CacheCategoriaKey, out categoria))
+            {
+                categoria = await _unitOfWork.CategoriaRepository.GetAsync(c => c.Id == id);
+                if (categoria is null) 
+                    return NotFound($"Categoria {id} não encontrada");
+                var cacheOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
+                    SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
+                    Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
+                };
+                _cache.Set(CacheCategoriaKey, categoria, cacheOptions);
+            }
+           
+            var categoriaDto = categoria?.ToCategoriaDTO();
             return categoriaDto!;
 
         }
