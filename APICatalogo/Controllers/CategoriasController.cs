@@ -152,6 +152,15 @@ namespace APICatalago.Controllers
             if (categoriaDto is null) return BadRequest("Dados inválidos");
             var categoria = categoriaDto.ToCategoria();
             var categoriaPost = _unitOfWork.CategoriaRepository.Add(categoria!);
+            _cache.Remove(CacheCategoriasKey);
+            var cacheKey = $"CacheCategoria_{categoriaPost.Id}";
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
+                SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
+                Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
+            };
+            _cache.Set(cacheKey, categoriaPost, cacheOptions);
             await _unitOfWork.CommitAsync();
             var categoriaDtoPost = categoriaPost.ToCategoriaDTO();
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaDtoPost!.Id });
