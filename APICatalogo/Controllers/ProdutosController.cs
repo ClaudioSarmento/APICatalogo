@@ -1,6 +1,5 @@
 ﻿using APICatalago.Domain.Entities;
 using APICatalago.DTOs;
-using APICatalago.Infrastructure.Mocks;
 using APICatalago.Pagination;
 using APICatalago.Repositories.Interfaces;
 using AutoMapper;
@@ -60,7 +59,6 @@ namespace APICatalago.Controllers
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetAsync()
         {
 
-           
             var produtos = await _unitOfWork.ProdutoRepository.GetAllAsync();
             if (!produtos.Any()) return NotFound("Produtos não encontrados...");
             var produtosDto = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);

@@ -7,7 +7,9 @@ using APICatalago.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace APICatalago.Controllers
 {
@@ -20,27 +22,44 @@ namespace APICatalago.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
+        private const string CacheCategoriasKey = "CacheCategorias";
 
-        public CategoriasController(IUnitOfWork unitOfWork)
+        public CategoriasController(IUnitOfWork unitOfWork, IMemoryCache cache)
         {
-          _unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
+            _cache = cache;
         }
-        
+
         /// <summary>
         /// Obtem uma lista de objetos Categoria
         /// </summary>
         /// <returns>Uma lista objetos Categoria</returns>
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetAsync()
         {
-
-            var categorias = await _unitOfWork.CategoriaRepository.GetAllAsync();
-            var categoriasDto = categorias.ToCategoriaDTOList();
+            if(!_cache.TryGetValue(CacheCategoriasKey, out IEnumerable<Categoria>? categorias))
+            {
+                categorias = await _unitOfWork.CategoriaRepository.GetAllAsync();
+                if(categorias is null || !categorias.Any()) 
+                    return NotFound("Não existem categorias...");
+                var cacheOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
+                    SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
+                    Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
+                };
+                _cache.Set(CacheCategoriasKey, categorias, cacheOptions);
+            }
+            var categoriasDto = categorias!.ToCategoriaDTOList();
             return Ok(categoriasDto);
 
         }
-        
+
         private ActionResult<IEnumerable<CategoriaDTO>> ObterCategorias(PagedList<Categoria> categorias)
         {
             var metadata = new
@@ -139,7 +158,7 @@ namespace APICatalago.Controllers
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<CategoriaDTO>> DeleteAsync(int id)
         {
-            var categoria = await _unitOfWork.CategoriaRepository.GetAsync(c =>c.Id == id);
+            var categoria = await _unitOfWork.CategoriaRepository.GetAsync(c => c.Id == id);
             if (categoria is null) return NotFound($"Categoria {id} não encontrada");
             var categoriaDeletada = _unitOfWork.CategoriaRepository.Delete(categoria);
             await _unitOfWork.CommitAsync();
