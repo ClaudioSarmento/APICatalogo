@@ -168,7 +168,9 @@ namespace APICatalago.Controllers
         }
 
         [HttpPut("{id:int:min(1)}")]
-        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoriaDTO>> Put(int id, [FromBody] CategoriaDTO categoriaDto)
         {
 
@@ -177,6 +179,14 @@ namespace APICatalago.Controllers
             var categoriaUpdate = _unitOfWork.CategoriaRepository.Update(categoria!);
             await _unitOfWork.CommitAsync();
             var categoriaDtoUpdate = categoriaUpdate.ToCategoriaDTO();
+            _cache.Set($"CacheCategoria_{id}", categoriaDtoUpdate, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(15),
+                Priority = CacheItemPriority.High
+            });
+
+            _cache.Remove(CacheCategoriasKey);
             return Ok(categoriaDtoUpdate);
 
         }
