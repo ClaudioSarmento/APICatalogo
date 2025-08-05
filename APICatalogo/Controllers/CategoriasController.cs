@@ -193,6 +193,9 @@ namespace APICatalago.Controllers
 
         [HttpDelete("{id:int:min(1)}")]
         [Authorize(Policy = "AdminOnly")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoriaDTO>> DeleteAsync(int id)
         {
             var categoria = await _unitOfWork.CategoriaRepository.GetAsync(c => c.Id == id);
@@ -200,6 +203,8 @@ namespace APICatalago.Controllers
             var categoriaDeletada = _unitOfWork.CategoriaRepository.Delete(categoria);
             await _unitOfWork.CommitAsync();
             var categoriaDto = categoriaDeletada.ToCategoriaDTO();
+            _cache.Remove($"CacheCategoria_{id}");
+            _cache.Remove(CacheCategoriasKey);
             return Ok(categoriaDto);
 
         }
