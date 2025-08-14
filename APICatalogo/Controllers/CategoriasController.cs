@@ -47,13 +47,7 @@ namespace APICatalago.Controllers
                 categorias = await _unitOfWork.CategoriaRepository.GetAllAsync();
                 if(categorias is null || !categorias.Any()) 
                     return NotFound("Não existem categorias...");
-                var cacheOptions = new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
-                    SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
-                    Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
-                };
-                _cache.Set(CacheCategoriasKey, categorias, cacheOptions);
+                SetCache(CacheCategoriasKey, categorias);
             }
             var categoriasDto = categorias!.ToCategoriaDTOList();
             return Ok(categoriasDto);
@@ -105,21 +99,16 @@ namespace APICatalago.Controllers
         [ProducesDefaultResponseType]
         public async Task<ActionResult<CategoriaDTO>> GetAsync(int id)
         {
-            var CacheCategoriaKey = $"CacheCategoria_{id}";
+            var cacheKey = GetCategoriaCacheKey(id);
             Categoria? categoria;
 
-            if (!_cache.TryGetValue(CacheCategoriaKey, out categoria))
+            if (!_cache.TryGetValue(cacheKey, out categoria))
             {
                 categoria = await _unitOfWork.CategoriaRepository.GetAsync(c => c.Id == id);
                 if (categoria is null) 
                     return NotFound($"Categoria {id} não encontrada");
-                var cacheOptions = new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
-                    SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
-                    Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
-                };
-                _cache.Set(CacheCategoriaKey, categoria, cacheOptions);
+               SetCache(cacheKey, categoria);
+               
             }
            
             var categoriaDto = categoria?.ToCategoriaDTO();
@@ -152,16 +141,8 @@ namespace APICatalago.Controllers
             if (categoriaDto is null) return BadRequest("Dados inválidos");
             var categoria = categoriaDto.ToCategoria();
             var categoriaPost = _unitOfWork.CategoriaRepository.Add(categoria!);
-            _cache.Remove(CacheCategoriasKey);
-            var cacheKey = $"CacheCategoria_{categoriaPost.Id}";
-            var cacheOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30), // O item vai ser removido automaticamente após 30 segundos
-                SlidingExpiration = TimeSpan.FromSeconds(15), // O item vai ser removido se ele não for acessado dentro de 15 segundos
-                Priority = CacheItemPriority.High, // O item tem alta prioridade, ele vai ser mantido na memória por mais tempo 
-            };
-            _cache.Set(cacheKey, categoriaPost, cacheOptions);
             await _unitOfWork.CommitAsync();
+            InvalidateCacheAfterChange(categoriaPost.Id, categoriaPost);
             var categoriaDtoPost = categoriaPost.ToCategoriaDTO();
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaDtoPost!.Id });
 
@@ -179,14 +160,7 @@ namespace APICatalago.Controllers
             var categoriaUpdate = _unitOfWork.CategoriaRepository.Update(categoria!);
             await _unitOfWork.CommitAsync();
             var categoriaDtoUpdate = categoriaUpdate.ToCategoriaDTO();
-            _cache.Set($"CacheCategoria_{id}", categoriaDtoUpdate, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
-                SlidingExpiration = TimeSpan.FromSeconds(15),
-                Priority = CacheItemPriority.High
-            });
-
-            _cache.Remove(CacheCategoriasKey);
+            InvalidateCacheAfterChange(id, categoriaUpdate);
             return Ok(categoriaDtoUpdate);
 
         }
@@ -203,11 +177,32 @@ namespace APICatalago.Controllers
             var categoriaDeletada = _unitOfWork.CategoriaRepository.Delete(categoria);
             await _unitOfWork.CommitAsync();
             var categoriaDto = categoriaDeletada.ToCategoriaDTO();
-            _cache.Remove($"CacheCategoria_{id}");
-            _cache.Remove(CacheCategoriasKey);
+            InvalidateCacheAfterChange(id);
             return Ok(categoriaDto);
 
         }
 
+        private string GetCategoriaCacheKey(int id) => $"CacheCategoria_{id}";
+
+        private void SetCache<T>(string key, T data)
+        {
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(15),
+                Priority = CacheItemPriority.High
+            };
+            _cache.Set(key, data, cacheOptions);
+        }
+
+        private void InvalidateCacheAfterChange(int id, Categoria? categoria = null)
+        {
+            _cache.Remove(CacheCategoriasKey);
+            _cache.Remove(GetCategoriaCacheKey(id));
+            if(categoria != null)
+            {
+                SetCache(GetCategoriaCacheKey(id), categoria);
+            }
+        }
     }
 }
